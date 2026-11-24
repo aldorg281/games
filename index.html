@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CONTSOFT Arcade - Zona de Mini Juegos y Premios</title>
+    <meta name="description" content="Diviértete en la zona de juegos de CONTSOFT y desbloquea premios y descuentos exclusivos.">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            background-color: #f8fafc;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(226, 232, 240, 0.85);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #2563eb 0%, #3b82f6 50%, #0ea5e9 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .mesh-gradient {
+            background-color: #f8fafc;
+            background-image:
+                radial-gradient(at 20% 15%, rgba(59, 130, 246, 0.12) 0px, transparent 50%),
+                radial-gradient(at 85% 10%, rgba(245, 158, 11, 0.10) 0px, transparent 50%),
+                radial-gradient(at 50% 90%, rgba(14, 165, 233, 0.08) 0px, transparent 50%);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+            transition: all 0.25s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.35);
+        }
+
+        .game-selector-card {
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .game-selector-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .game-selector-card.active-game {
+            border-color: #2563eb;
+            background: linear-gradient(135deg, rgba(239, 246, 255, 0.98) 0%, rgba(255, 255, 255, 0.98) 100%);
+            box-shadow: 0 14px 30px rgba(37, 99, 235, 0.18);
+        }
+
+        /* Estilos Juego 3: Memoria */
+        .memory-card {
+            aspect-ratio: 1 / 1;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .memory-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+
+        .memory-card.flipped .memory-card-inner,
+        .memory-card.matched .memory-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .memory-face {
+            position: absolute;
+            inset: 0;
+            backface-visibility: hidden;
+            border-radius: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem;
+            text-align: center;
+        }
+
+        .memory-front {
+            background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
+            color: white;
+            border: 2px solid #60a5fa;
+        }
+
+        .memory-back {
+            background: #ffffff;
+            border: 2px solid #cbd5e1;
+            transform: rotateY(180deg);
+        }
+
+        .memory-card.matched .memory-back {
+            border-color: #10b981;
+            background: #ecfdf5;
+        }
+    </style>
+</head>
+<body class="mesh-gradient text-gray-800 min-h-screen flex flex-col">
+
+    <!-- Top Bar -->
+    <div class="bg-primary-900 text-white py-2 px-4">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-3 text-xs sm:text-sm">
+            <div class="flex items-center gap-2 font-semibold">
+                <i data-lucide="gamepad-2" class="w-4 h-4 text-amber-400"></i>
+                <span>CONTSOFT ARCADE • Juega, diviértete y gana descuentos</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <a href="https://wa.me/51930577064?text=Hola,%20vengo%20de%20la%20zona%20de%20juegos%20de%20CONTSOFT"
+                   target="_blank" rel="noopener noreferrer"
+                   class="inline-flex items-center gap-1.5 text-emerald-300 hover:text-emerald-200 font-semibold transition">
+                    <i data-lucide="message-circle" class="w-4 h-4"></i>
+                    <span>WhatsApp: +51 930 577 064</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header / Navbar -->
+    <header class="sticky top-0 z-40 glass border-b border-gray-200/80">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
+            <a href="#" class="flex items-center space-x-2.5">
+                <div class="w-10 h-10 bg-gradient-to-br from-primary-600 to-primary-800 rounded-xl flex items-center justify-center shadow-md">
+                    <i data-lucide="gamepad-2" class="w-6 h-6 text-white"></i>
+                </div>
+                <div>
+                    <span class="text-xl sm:text-2xl font-black text-primary-900 tracking-tight">CONT<span class="text-primary-600">SOFT</span></span>
+                    <span class="ml-1.5 text-xs font-extrabold uppercase tracking-wider bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full border border-amber-300">Arcade</span>
+                </div>
+            </a>
+
+            <div class="flex items-center gap-2 sm:gap-3">
+                <span class="hidden md:inline-flex items-center gap-1.5 text-xs font-bold text-primary-700 bg-primary-50 border border-primary-200 px-3 py-1.5 rounded-full">
+                    <i data-lucide="trophy" class="w-4 h-4 text-amber-500"></i>
+                    <span>3 Mini Juegos Disponibles</span>
+                </span>
+                <button onclick="reclamarDescuentoJuego()" class="btn-primary px-4 sm:px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold text-white shadow-md inline-flex items-center gap-1.5">
+                    <i data-lucide="gift" class="w-4 h-4"></i>
+                    <span>Canjear Premio</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenido Principal: Portal de Juegos -->
+    <main class="flex-1 py-8 sm:py-12">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+
+            <!-- Título Principal -->
+            <div class="text-center mb-8">
+                <span class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-700 bg-amber-100 border border-amber-300 px-3.5 py-1.5 rounded-full mb-3">
+                    <i data-lucide="sparkles" class="w-4 h-4 text-amber-600"></i>
+                    Zona Interactiva • Elige tu Desafío
+                </span>
+                <h1 class="text-3xl sm:text-5xl font-extrabold text-gray-900 mb-3">
+                    Juega y gana <span class="gradient-text">beneficios exclusivos</span>
+                </h1>
+                <p class="text-gray-600 max-w-2xl mx-auto text-sm sm:text-base">
+                    Selecciona cualquiera de los <strong>3 mini juegos</strong>, supera el reto y desbloquea tu cupón de <strong>15% de descuento</strong>.
+                </p>
+            </div>
+
+            <!-- ========================================================= -->
+            <!-- SELECTOR DE LOS 3 JUEGOS                                  -->
+            <!-- ========================================================= -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+                <!-- Opción 1: Juego Original -->
+                <button type="button" id="tab-game-1" onclick="seleccionarJuego(1)"
+                    class="game-selector-card active-game glass-card rounded-2xl p-4 text-left border-2 flex items-center gap-3.5">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-600 to-sky-500 text-white flex items-center justify-center shrink-0 shadow-md">
+                        <i data-lucide="bot" class="w-6 h-6"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <span class="text-[11px] font-extrabold uppercase tracking-wider text-primary-600 block">Juego 1 • Runner</span>
+                        <h2 class="font-bold text-gray-900 text-base truncate">ContSoft Bot Salta</h2>
+                        <p class="text-xs text-gray-500 truncate">Esquiva los obstáculos</p>
+                    </div>
+                </button>
+
+                <!-- Opción 2: Atrapa Comprobantes -->
+                <button type="button" id="tab-game-2" onclick="seleccionarJuego(2)"
+                    class="game-selector-card glass-card rounded-2xl p-4 text-left border-2 border-gray-200 flex items-center gap-3.5">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center shrink-0 shadow-md">
+                        <i data-lucide="receipt" class="w-6 h-6"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <span class="text-[11px] font-extrabold uppercase tracking-wider text-emerald-600 block">Juego 2 • Reflejos</span>
+                        <h2 class="font-bold text-gray-900 text-base truncate">Atrapa Facturas SUNAT</h2>
+                        <p class="text-xs text-gray-500 truncate">Suma 150 pts sin multas</p>
+                    </div>
+                </button>
+
+                <!-- Opción 3: Memoria Empresarial -->
+                <button type="button" id="tab-game-3" onclick="seleccionarJuego(3)"
+                    class="game-selector-card glass-card rounded-2xl p-4 text-left border-2 border-gray-200 flex items-center gap-3.5">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 text-white flex items-center justify-center shrink-0 shadow-md">
+                        <i data-lucide="brain" class="w-6 h-6"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <span class="text-[11px] font-extrabold uppercase tracking-wider text-amber-600 block">Juego 3 • Ingenio</span>
+                        <h2 class="font-bold text-gray-900 text-base truncate">Memoria ERP</h2>
+                        <p class="text-xs text-gray-500 truncate">Encuentra los 6 pares</p>
+                    </div>
+                </button>
+            </div>
+
+            <!-- ========================================================= -->
+            <!-- JUEGO 1: MINI JUEGO ORIGINAL (CONTSOFT BOT RUNNER)        -->
+            <!-- ========================================================= -->
+            <section id="panel-game-1" class="glass-card rounded-3xl p-4 sm:p-8 shadow-2xl border-2 border-primary-200/80 relative">
+                <!-- Barra superior de progreso y controles -->
+                <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs sm:text-sm font-bold text-gray-700 uppercase tracking-wider">Progreso a la meta:</span>
+                        <span id="gamePercentText" class="text-sm sm:text-base font-extrabold text-primary-600">0%</span>
+                    </div>
+
+                    <!-- Barra de progreso -->
+                    <div class="flex-1 min-w-[180px] max-w-md h-4 bg-gray-200 rounded-full overflow-hidden p-0.5 shadow-inner">
+                        <div id="gameProgressBar" class="h-full bg-gradient-to-r from-primary-600 via-sky-400 to-amber-400 rounded-full transition-all duration-150" style="width: 0%;"></div>
+                    </div>
+
+                    <div class="flex items-center gap-2 text-xs font-semibold text-gray-500 bg-white/80 px-3 py-1.5 rounded-full border border-gray-200">
+                        <i data-lucide="mouse-pointer-click" class="w-4 h-4 text-primary-600"></i>
+                        <span>Clic / Tocar / Espacio para Saltar</span>
+                    </div>
+                </div>
+
+                <!-- Área del Canvas -->
+                <div class="relative w-full min-h-[380px] sm:min-h-[340px] flex items-center rounded-2xl overflow-hidden border border-slate-200 shadow-inner bg-gradient-to-b from-sky-50 via-white to-slate-100 select-none">
+                    <canvas id="contsoftGameCanvas" width="900" height="320" class="w-full h-[380px] sm:h-[320px] block cursor-pointer"></canvas>
+
+                    <!-- PANTALLA 1: INICIO -->
+                    <div id="gameStartOverlay" class="absolute inset-0 bg-slate-900/75 backdrop-blur-sm flex flex-col items-center justify-center p-4 sm:p-6 text-center text-white z-10 overflow-y-auto">
+                        <img src="./img/robot-contsoft.png" alt="ContSoft Bot" onerror="this.style.display='none'" class="w-16 h-16 sm:w-20 sm:h-20 object-contain mb-2 sm:mb-3 drop-shadow-lg animate-bounce shrink-0">
+                        <h3 class="text-xl sm:text-3xl font-extrabold mb-1.5 sm:mb-2 leading-tight">¿Listo para liberarte de las cuotas?</h3>
+                        <p class="text-xs sm:text-base text-sky-100 max-w-md mb-4 sm:mb-6">
+                            Salta sobre el <strong>Mal Soporte</strong>, <strong>Software Lento</strong>, <strong>Pagos Mensuales</strong> y <strong>Sistemas Difíciles</strong>.
+                        </p>
+                        <button type="button" onclick="iniciarJuegoContsoft()" class="btn-primary px-6 sm:px-8 py-3 sm:py-3.5 rounded-full font-bold text-white text-sm sm:text-lg shadow-xl inline-flex items-center gap-2 shrink-0">
+                            <i data-lucide="play" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+                            <span>¡Jugar y Ganar 15% DCTO!</span>
+                        </button>
+                    </div>
+
+                    <!-- PANTALLA 2: GAME OVER -->
+                    <div id="gameOverOverlay" class="hidden absolute inset-0 bg-slate-950/85 backdrop-blur-sm flex flex-col items-center justify-center p-4 sm:p-6 text-center text-white z-10 overflow-y-auto">
+                        <div class="w-12 h-12 sm:w-14 sm:h-14 bg-red-500/20 border border-red-400 rounded-2xl flex items-center justify-center mb-2 sm:mb-3 shrink-0">
+                            <i data-lucide="alert-triangle" class="w-6 h-6 sm:w-8 sm:h-8 text-red-400"></i>
+                        </div>
+                        <h3 class="text-xl sm:text-3xl font-extrabold text-red-400 mb-1 leading-tight">¡Te atrapó un problema tradicional!</h3>
+                        <p id="gameOverReason" class="text-sm sm:text-lg text-gray-200 font-medium mb-4 sm:mb-6">
+                            Chocaste con: Pagos Mensuales Excesivos
+                        </p>
+                        <button type="button" onclick="iniciarJuegoContsoft()" class="bg-white text-gray-900 hover:bg-gray-100 px-6 sm:px-7 py-2.5 sm:py-3 rounded-full font-bold text-sm sm:text-base shadow-lg inline-flex items-center gap-2 transition shrink-0">
+                            <i data-lucide="rotate-ccw" class="w-4 h-4 sm:w-5 sm:h-5 text-primary-600"></i>
+                            <span>Intentar de Nuevo</span>
+                        </button>
+                    </div>
+
+                    <!-- PANTALLA 3: VICTORIA -->
+                    <div id="gameWinOverlay" class="hidden absolute inset-0 bg-gradient-to-br from-blue-950/95 via-primary-900/95 to-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center px-4 py-3 sm:p-6 text-center text-white z-10 overflow-y-auto">
+                        <div class="inline-flex items-center gap-1.5 bg-amber-400/20 border border-amber-400 text-amber-300 px-3 py-0.5 sm:px-4 sm:py-1 rounded-full text-[11px] sm:text-xs font-bold uppercase tracking-widest mb-1.5 sm:mb-2 shrink-0">
+                            <i data-lucide="trophy" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
+                            <span>¡Meta Alcanzada!</span>
+                        </div>
+
+                        <h3 class="text-xl sm:text-4xl font-extrabold mb-1 sm:mb-2 leading-tight">
+                            ¡Ganaste un <span class="text-amber-400">15% DE DESCUENTO</span>!
+                        </h3>
+
+                        <p class="text-xs sm:text-base text-sky-100 max-w-lg mb-2.5 sm:mb-4 leading-snug">
+                            Superaste todos los obstáculos. Usa tu código para reclamar tu premio:
+                        </p>
+
+                        <div class="bg-white/10 border-2 border-dashed border-amber-400 px-4 sm:px-6 py-1.5 sm:py-2 rounded-xl mb-3 sm:mb-4 shrink-0">
+                            <span class="text-[10px] sm:text-xs text-amber-200 block uppercase tracking-wider">Código de Premio</span>
+                            <span class="text-lg sm:text-2xl font-black tracking-widest text-amber-300">CONTSOFT15</span>
+                        </div>
+
+                        <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3 shrink-0">
+                            <button type="button" onclick="reclamarDescuentoJuego()" class="bg-green-500 hover:bg-green-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-full font-bold text-xs sm:text-base shadow-xl inline-flex items-center gap-2 transition cursor-pointer">
+                                <i data-lucide="message-circle" class="w-4 h-4 sm:w-5 sm:h-5 shrink-0"></i>
+                                <span>Reclamar 15% por WhatsApp</span>
+                            </button>
+                            <button type="button" onclick="iniciarJuegoContsoft()" class="bg-white/15 hover:bg-white/25 border border-white/30 text-white px-4 sm:px-5 py-2 sm:py-3 rounded-full font-semibold text-xs sm:text-sm inline-flex items-center gap-1.5 transition cursor-pointer">
+                                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0"></i>
+                                <span>Volver a jugar</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========================================================= -->
+            <!-- JUEGO 2: ATRAPA COMPROBANTES SUNAT (NUEVO)                -->
+            <!-- ========================================================= -->
+            <section id="panel-game-2" class="hidden glass-card rounded-3xl p-4 sm:p-8 shadow-2xl border-2 border-emerald-200/80 relative">
+                <!-- Marcador superior -->
+                <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+                    <div class="flex items-center gap-4">
+                        <div class="bg-emerald-50 border border-emerald-200 px-3.5 py-1.5 rounded-xl">
+                            <span class="text-xs font-bold text-emerald-700 uppercase">Puntos:</span>
+                            <span id="catcherScore" class="text-base font-black text-emerald-800 ml-1">0 / 150</span>
+                        </div>
+                        <div class="bg-rose-50 border border-rose-200 px-3.5 py-1.5 rounded-xl">
+                            <span class="text-xs font-bold text-rose-700 uppercase">Vidas:</span>
+                            <span id="catcherLives" class="text-base font-black text-rose-600 ml-1">❤️❤️❤️</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 text-xs font-semibold text-gray-600 bg-white/90 px-3 py-1.5 rounded-full border border-gray-200">
+                        <i data-lucide="move-horizontal" class="w-4 h-4 text-emerald-600"></i>
+                        <span>Mueve con Mouse, Dedo o Flechas ◀ ▶</span>
+                    </div>
+                </div>
+
+                <!-- Canvas Juego 2 -->
+                <div class="relative w-full min-h-[380px] sm:min-h-[340px] flex items-center rounded-2xl overflow-hidden border border-slate-200 shadow-inner bg-gradient-to-b from-emerald-50 via-white to-slate-100 select-none">
+                    <canvas id="catcherGameCanvas" width="900" height="340" class="w-full h-[380px] sm:h-[340px] block cursor-ew-resize"></canvas>
+
+                    <!-- Overlay Inicio Juego 2 -->
+                    <div id="catcherStartOverlay" class="absolute inset-0 bg-slate-900/80 backdrop-blur-sm flex flex-col items-center justify-center p-4 sm:p-6 text-center text-white z-10">
+                        <div class="w-16 h-16 bg-emerald-500/20 border border-emerald-400 rounded-2xl flex items-center justify-center mb-3">
+                            <i data-lucide="receipt" class="w-9 h-9 text-emerald-400"></i>
+                        </div>
+                        <h3 class="text-xl sm:text-3xl font-extrabold mb-2">Atrapa Comprobantes SUNAT</h3>
+                        <p class="text-xs sm:text-base text-emerald-100 max-w-md mb-5">
+                            Atrapa <strong>Facturas (+10)</strong>, <strong>Boletas (+10)</strong> y <strong>Guías GRE (+20)</strong> hasta llegar a <strong>150 puntos</strong>. ¡Evita las <strong>Multas</strong> y <strong>Caídas de Sistema</strong>!
+                        </p>
+                        <button type="button" onclick="iniciarJuegoCatcher()" class="bg-emerald-500 hover:bg-emerald-600 px-7 py-3 rounded-full font-bold text-white text-sm sm:text-lg shadow-xl inline-flex items-center gap-2 transition">
+                            <i data-lucide="play" class="w-5 h-5"></i>
+                            <span>Comenzar Partida</span>
+                        </button>
+                    </div>
+
+                    <!-- Overlay Game Over Juego 2 -->
+                    <div id="catcherOverOverlay" class="hidden absolute inset-0 bg-slate-950/85 backdrop-blur-sm flex flex-col items-center justify-center p-4 sm:p-6 text-center text-white z-10">
+                        <div class="w-14 h-14 bg-red-500/20 border border-red-400 rounded-2xl flex items-center justify-center mb-3">
+                            <i data-lucide="x-circle" class="w-8 h-8 text-red-400"></i>
+                        </div>
+                        <h3 class="text-xl sm:text-3xl font-extrabold text-red-400 mb-1">¡Caja Cerrada por Incidencias!</h3>
+                        <p id="catcherOverText" class="text-sm sm:text-base text-gray-200 mb-5">Lograste 0 puntos. ¡Inténtalo de nuevo!</p>
+                        <button type="button" onclick="iniciarJuegoCatcher()" class="bg-white text-gray-900 hover:bg-gray-100 px-6 py-2.5 rounded-full font-bold text-sm sm:text-base shadow-lg inline-flex items-center gap-2 transition">
+                            <i data-lucide="rotate-ccw" class="w-4 h-4 text-emerald-600"></i>
+                            <span>Reintentar</span>
+                        </button>
+                    </div>
+
+                    <!-- Overlay Victoria Juego 2 -->
+                    <div id="catcherWinOverlay" class="hidden absolute inset-0 bg-gradient-to-br from-emerald-950/95 via-teal-900/95 to-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center p-4 sm:p-6 text-center text-white z-10">
+                        <span class="inline-flex items-center gap-1.5 bg-amber-400/20 border border-amber-400 text-amber-300 px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-widest mb-2">
+                            <i data-lucide="trophy" class="w-4 h-4"></i> ¡150 Puntos Alcanzados!
+                        </span>
+                        <h3 class="text-xl sm:text-4xl font-extrabold mb-2">¡Eres un Maestro de la Facturación!</h3>
+                        <p class="text-xs sm:text-base text-emerald-100 max-w-md mb-3">Desbloqueaste tu cupón de <strong>15% de descuento</strong>:</p>
+                        <div class="bg-white/10 border-2 border-dashed border-amber-400 px-6 py-2 rounded-xl mb-4">
+                            <span class="text-xl sm:text-2xl font-black tracking-widest text-amber-300">CONTSOFT15</span>
+                        </div>
+                        <div class="flex flex-wrap justify-center gap-3">
+                            <button type="button" onclick="reclamarDescuentoJuego()" class="bg-green-500 hover:bg-green-600 text-white px-5 py-2.5 rounded-full font-bold text-xs sm:text-base shadow-xl inline-flex items-center gap-2">
+                                <i data-lucide="message-circle" class="w-4 h-4"></i>
+                                <span>Reclamar por WhatsApp</span>
+                            </button>
+                            <button type="button" onclick="iniciarJuegoCatcher()" class="bg-white/15 hover:bg-white/25 border border-white/30 text-white px-4 py-2.5 rounded-full font-semibold text-xs sm:text-sm">
+                                Jugar otra vez
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========================================================= -->
+            <!-- JUEGO 3: MEMORIA EMPRESARIAL ERP (NUEVO)                  -->
+            <!-- ========================================================= -->
+            <section id="panel-game-3" class="hidden glass-card rounded-3xl p-4 sm:p-8 shadow-2xl border-2 border-amber-200/80 relative">
+                <!-- Barra superior de estado -->
+                <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-amber-50 border border-amber-200 px-3.5 py-1.5 rounded-xl">
+                            <span class="text-xs font-bold text-amber-800 uppercase">Pares:</span>
+                            <span id="memoryPairs" class="text-base font-black text-amber-600 ml-1">0 / 6</span>
+                        </div>
+                        <div class="bg-primary-50 border border-primary-200 px-3.5 py-1.5 rounded-xl">
+                            <span class="text-xs font-bold text-primary-800 uppercase">Movimientos:</span>
+                            <span id="memoryMoves" class="text-base font-black text-primary-600 ml-1">0</span>
+                        </div>
+                    </div>
+
+                    <button type="button" onclick="iniciarJuegoMemoria()" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-xl text-xs sm:text-sm font-bold shadow inline-flex items-center gap-1.5 transition">
+                        <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                        <span>Reiniciar Tablero</span>
+                    </button>
+                </div>
+
+                <!-- Tablero de 12 cartas (4x3) -->
+                <div id="memoryGrid" class="grid grid-cols-3 sm:grid-cols-4 gap-3 sm:gap-4 max-w-2xl mx-auto"></div>
+
+                <!-- Banner de victoria Juego 3 -->
+                <div id="memoryWinBanner" class="hidden mt-6 p-5 rounded-2xl bg-gradient-to-r from-blue-900 to-primary-800 text-white text-center shadow-xl">
+                    <h3 class="text-xl sm:text-2xl font-extrabold text-amber-300 mb-1">¡Memoria Impecable! Completaste todos los módulos</h3>
+                    <p id="memoryWinStats" class="text-xs sm:text-sm text-sky-100 mb-3">Completado en 0 movimientos. Código desbloqueado: <strong>CONTSOFT15</strong></p>
+                    <button type="button" onclick="reclamarDescuentoJuego()" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2.5 rounded-full font-bold text-xs sm:text-sm shadow-lg inline-flex items-center gap-2">
+                        <i data-lucide="message-circle" class="w-4 h-4"></i>
+                        <span>Reclamar 15% DCTO por WhatsApp</span>
+                    </button>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Footer compacto -->
+    <footer class="bg-gray-900 text-white py-6 mt-12">
+        <div class="max-w-5xl mx-auto px-4 text-center text-xs sm:text-sm text-gray-400">
+            <p><strong class="text-white">CONTSOFT Arcade</strong> • Desarrollado por <strong class="text-primary-400">A & R CONSULTING</strong> &copy; 2026</p>
+        </div>
+    </footer>
+
+    <!-- ========================================================= -->
+    <!-- SCRIPTS DE NAVEGACIÓN Y DE LOS 3 JUEGOS                   -->
+    <!-- ========================================================= -->
+    <script>
+        lucide.createIcons();
+
+        // Función global para reclamar descuento por WhatsApp
+        window.reclamarDescuentoJuego = function() {
+            const msg = "¡Hola! Completé un desafío en CONTSOFT Arcade y gané mi cupón de 15% DE DESCUENTO (Código: CONTSOFT15). Deseo más información.";
+            window.open(`https://wa.me/51930577064?text=${encodeURIComponent(msg)}`, '_blank');
+        };
+
+        // Selector entre los 3 juegos
+        let juegoActivo = 1;
+        function seleccionarJuego(num) {
+            juegoActivo = num;
+            for (let i = 1; i <= 3; i++) {
+                const panel = document.getElementById(`panel-game-${i}`);
+                const tab = document.getElementById(`tab-game-${i}`);
+                if (i === num) {
+                    panel.classList.remove('hidden');
+                    tab.classList.add('active-game');
+                    tab.classList.remove('border-gray-200');
+                } else {
+                    panel.classList.add('hidden');
+                    tab.classList.remove('active-game');
+                    tab.classList.add('border-gray-200');
+                }
+            }
+            if (num === 3 && !window.memoriaInicializada) {
+                iniciarJuegoMemoria();
+            }
+            lucide.createIcons();
+        }
+    </script>
+
+    <!-- SCRIPT JUEGO 1: CONTSOFT BOT RUNNER (ORIGINAL) -->
+    <script>
+        (function() {
+            const canvas = document.getElementById('contsoftGameCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+
+            const ROBOT_IMG_SRC = './img/robot-contsoft.png';
+            const robotImg = new Image();
+            robotImg.src = ROBOT_IMG_SRC;
+
+            let gameState = 'START';
+            let animationFrameId;
+            let distance = 0;
+            let gameSpeed = 6.2;
+            let frameCount = 0;
+
+            const GROUND_Y = 265;
+
+            const player = {
+                x: 75,
+                y: GROUND_Y - 68,
+                width: 62,
+                height: 68,
+                vy: 0,
+                gravity: 0.68,
+                jumpPower: -15.2,
+                isGrounded: true,
+                jump() {
+                    if (this.isGrounded && gameState === 'PLAYING' && juegoActivo === 1) {
+                        this.vy = this.jumpPower;
+                        this.isGrounded = false;
+                    }
+                },
+                update() {
+                    this.y += this.vy;
+                    if (this.y + this.height < GROUND_Y) {
+                        this.vy += this.gravity;
+                        this.isGrounded = false;
+                    } else {
+                        this.y = GROUND_Y - this.height;
+                        this.vy = 0;
+                        this.isGrounded = true;
+                    }
+                },
+                draw() {
+                    ctx.save();
+                    const shadowScale = Math.max(0.4, 1 - (GROUND_Y - (this.y + this.height)) / 180);
+                    ctx.fillStyle = 'rgba(15, 23, 42, 0.15)';
+                    ctx.beginPath();
+                    ctx.ellipse(this.x + this.width / 2, GROUND_Y + 4, (this.width / 2.2) * shadowScale, 6 * shadowScale, 0, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    if (!this.isGrounded) {
+                        ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
+                        ctx.rotate(-0.08);
+                        ctx.translate(-(this.x + this.width / 2), -(this.y + this.height / 2));
+                    }
+
+                    if (robotImg.complete && robotImg.naturalWidth > 0) {
+                        ctx.drawImage(robotImg, this.x, this.y, this.width, this.height);
+                    } else {
+                        ctx.fillStyle = '#2563eb';
+                        ctx.beginPath();
+                        ctx.roundRect(this.x, this.y, this.width, this.height, 14);
+                        ctx.fill();
+                        ctx.fillStyle = '#ffffff';
+                        ctx.font = 'bold 14px Inter, sans-serif';
+                        ctx.fillText('BOT', this.x + 16, this.y + 38);
+                    }
+                    ctx.restore();
+                }
+            };
+
+            const obstacleImages = {};
+            function loadObstacleImage(key, src) {
+                const img = new Image();
+                img.src = src;
+                obstacleImages[key] = img;
+            }
+
+            loadObstacleImage('pagos', './img/obstaculos/pagos-mensuales.png');
+            loadObstacleImage('soporte', './img/obstaculos/mal-soporte.png');
+            loadObstacleImage('lento', './img/obstaculos/software-lento.png');
+            loadObstacleImage('dificil', './img/obstaculos/dificil-usar.png');
+            loadObstacleImage('errores', './img/obstaculos/errores-sunat.png');
+            loadObstacleImage('actualizaciones', './img/obstaculos/cobros-extra.png');
+            loadObstacleImage('enlatado', './img/obstaculos/enlatado.png');
+
+            // const OBSTACLE_TYPES = [
+            //     { imgKey: 'pagos', line1: 'PAGOS', line2: 'MENSUALES', color: '#dc2626', bg: '#fef2f2', border: '#f87171', w: 225, h: 68 },
+            //     { imgKey: 'soporte', line1: 'MAL', line2: 'SOPORTE', color: '#ea580c', bg: '#fff7ed', border: '#fb923c', w: 205, h: 68 },
+            //     { imgKey: 'lento', line1: 'SOFTWARE', line2: 'LENTO', color: '#b45309', bg: '#fffbeb', border: '#fbbf24', w: 215, h: 68 },
+            //     { imgKey: 'dificil', line1: 'DIFÍCIL', line2: 'DE USAR', color: '#7c3aed', bg: '#f5f3ff', border: '#a78bfa', w: 205, h: 68 },
+            //     { imgKey: 'errores', line1: 'ERRORES', line2: 'SUNAT', color: '#be123c', bg: '#fff1f2', border: '#fb7185', w: 205, h: 68 },
+            //     { imgKey: 'actualizaciones', line1: 'COBROS POR', line2: 'ACTUALIZAR', color: '#0369a1', bg: '#f0f9ff', border: '#38bdf8', w: 235, h: 68 },
+            //     { imgKey: 'enlatado', line1: 'SOFTWARE', line2: 'ENLATADO', color: '#065f46', bg: '#ecfdf5', border: '#34d399', w: 220, h: 68 }
+            // ];
+
+            const OBSTACLE_TYPES = [
+                { imgKey: 'pagos',          line1: 'PAGOS',      line2: 'MENSUALES',  w: 110, h: 85 },
+                { imgKey: 'soporte',        line1: 'MAL',        line2: 'SOPORTE',    w: 100, h: 85 },
+                { imgKey: 'lento',          line1: 'SOFTWARE',   line2: 'LENTO',      w: 110, h: 85 },
+                { imgKey: 'dificil',        line1: 'DIFÍCIL',    line2: 'DE USAR',    w: 100, h: 85 },
+                { imgKey: 'errores',        line1: 'ERRORES',    line2: 'SUNAT',      w: 100, h: 85 },
+                { imgKey: 'actualizaciones',line1: 'COBROS POR', line2: 'ACTUALIZAR', w: 115, h: 85 },
+                { imgKey: 'enlatado',       line1: 'SOFTWARE',   line2: 'ENLATADO',   w: 110, h: 85 }
+            ];
+
+            let obstacleQueue = [];
+            function refillObstacleQueue() {
+                const pool = [...OBSTACLE_TYPES];
+                for (let i = pool.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [pool[i], pool[j]] = [pool[j], pool[i]];
+                }
+                obstacleQueue.push(...pool);
+            }
+
+            const GOAL_DISTANCE = Math.max(2600, OBSTACLE_TYPES.length * 620);
+            let obstacles = [];
+            let nextObstacleTimer = 70;
+
+            function spawnObstacle() {
+                if (obstacleQueue.length === 0) refillObstacleQueue();
+                const template = obstacleQueue.shift();
+                obstacles.push({
+                    ...template,
+                    x: canvas.width + 20,
+                    y: GROUND_Y - template.h
+                });
+            }
+
+            const finishLine = {
+                x: 950,
+                active: false,
+                draw() {
+                    if (!this.active) return;
+                    ctx.fillStyle = '#f59e0b';
+                    ctx.fillRect(this.x, GROUND_Y - 135, 8, 135);
+
+                    ctx.save();
+                    ctx.fillStyle = '#1e3a8a';
+                    ctx.strokeStyle = '#fbbf24';
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.roundRect(this.x - 45, GROUND_Y - 145, 110, 56, 12);
+                    ctx.fill();
+                    ctx.stroke();
+
+                    ctx.fillStyle = '#fbbf24';
+                    ctx.font = '900 18px Inter, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('15% DCTO', this.x + 10, GROUND_Y - 120);
+
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = 'bold 11px Inter, sans-serif';
+                    ctx.fillText('META CONTSOFT', this.x + 10, GROUND_Y - 101);
+                    ctx.restore();
+                }
+            };
+
+            const clouds = [
+                { x: 150, y: 55, speed: 0.6 },
+                { x: 480, y: 40, speed: 0.4 },
+                { x: 780, y: 70, speed: 0.5 }
+            ];
+
+            function drawBackground() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                ctx.fillStyle = 'rgba(219, 234, 254, 0.75)';
+                clouds.forEach(c => {
+                    if (gameState === 'PLAYING') {
+                        c.x -= c.speed;
+                        if (c.x < -100) c.x = canvas.width + 80;
+                    }
+                    ctx.beginPath();
+                    ctx.arc(c.x, c.y, 18, 0, Math.PI * 2);
+                    ctx.arc(c.x + 18, c.y - 6, 22, 0, Math.PI * 2);
+                    ctx.arc(c.x + 38, c.y, 16, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+
+                ctx.fillStyle = '#e2e8f0';
+                ctx.fillRect(0, GROUND_Y, canvas.width, canvas.height - GROUND_Y);
+
+                ctx.strokeStyle = '#3b82f6';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(0, GROUND_Y);
+                ctx.lineTo(canvas.width, GROUND_Y);
+                ctx.stroke();
+
+                ctx.fillStyle = '#94a3b8';
+                const offset = (distance * 1.5) % 60;
+                for (let x = -offset; x < canvas.width; x += 60) {
+                    ctx.fillRect(x, GROUND_Y + 14, 26, 4);
+                }
+            }
+
+            // function drawObstacle(obs) {
+            //     ctx.save();
+            //     ctx.fillStyle = 'rgba(0,0,0,0.10)';
+            //     ctx.beginPath();
+            //     ctx.roundRect(obs.x + 3, obs.y + 4, obs.w, obs.h, 14);
+            //     ctx.fill();
+
+            //     ctx.fillStyle = obs.bg;
+            //     ctx.strokeStyle = obs.border;
+            //     ctx.lineWidth = 3;
+            //     ctx.beginPath();
+            //     ctx.roundRect(obs.x, obs.y, obs.w, obs.h, 14);
+            //     ctx.fill();
+            //     ctx.stroke();
+
+            //     const iconSize = 46;
+            //     const iconX = obs.x + 10;
+            //     const iconY = obs.y + (obs.h - iconSize) / 2;
+            //     const img = obstacleImages[obs.imgKey];
+
+            //     if (img && img.complete && img.naturalWidth > 0) {
+            //         ctx.save();
+            //         ctx.beginPath();
+            //         ctx.roundRect(iconX, iconY, iconSize, iconSize, 10);
+            //         ctx.clip();
+            //         ctx.drawImage(img, iconX, iconY, iconSize, iconSize);
+            //         ctx.restore();
+            //     }
+
+            //     const textAreaLeft = iconX + iconSize + 6;
+            //     const textAreaWidth = (obs.x + obs.w - 8) - textAreaLeft;
+            //     const textCenterX = textAreaLeft + (textAreaWidth / 2);
+
+            //     ctx.font = '900 16px "Inter", system-ui, -apple-system, sans-serif';
+            //     ctx.textAlign = 'center';
+            //     ctx.textBaseline = 'middle';
+            //     ctx.lineJoin = 'round';
+            //     ctx.lineWidth = 3.5;
+            //     ctx.strokeStyle = '#ffffff';
+            //     ctx.fillStyle = obs.color;
+
+            //     ctx.strokeText(obs.line1, textCenterX, obs.y + 23, textAreaWidth);
+            //     ctx.fillText(obs.line1, textCenterX, obs.y + 23, textAreaWidth);
+
+            //     ctx.strokeText(obs.line2, textCenterX, obs.y + 45, textAreaWidth);
+            //     ctx.fillText(obs.line2, textCenterX, obs.y + 45, textAreaWidth);
+
+            //     ctx.restore();
+            // }
+
+            // 2. Reemplaza drawObstacle(obs) para dibujar solo la imagen completa
+            function drawObstacle(obs) {
+                const img = obstacleImages[obs.imgKey];
+
+                ctx.save();
+                // Sombra suave debajo de la imagen
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.14)';
+                ctx.beginPath();
+                ctx.ellipse(obs.x + obs.w / 2, GROUND_Y + 3, obs.w * 0.42, 5, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                if (img && img.complete && img.naturalWidth > 0) {
+                    // Dibuja la imagen PNG completa ocupando todo el obstáculo
+                    ctx.drawImage(img, obs.x, obs.y, obs.w, obs.h);
+                } else {
+                    // Respaldo por si alguna imagen aún no carga o no existe
+                    ctx.fillStyle = '#ef4444';
+                    ctx.beginPath();
+                    ctx.roundRect(obs.x, obs.y, obs.w, obs.h, 12);
+                    ctx.fill();
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = 'bold 12px Inter, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(obs.line1, obs.x + obs.w / 2, obs.y + obs.h / 2);
+                }
+                ctx.restore();
+            }
+
+            function checkCollision(p, obs) {
+                const padX = 13;
+                const padY = 10;
+                return (
+                    p.x + padX < obs.x + obs.w - 8 &&
+                    p.x + p.width - padX > obs.x + 8 &&
+                    p.y + p.height - padY > obs.y + 8 &&
+                    p.y + padY < obs.y + obs.h - 4
+                );
+            }
+
+            function updateProgressUI() {
+                const pct = Math.min(100, Math.floor((distance / GOAL_DISTANCE) * 100));
+                const bar = document.getElementById('gameProgressBar');
+                const txt = document.getElementById('gamePercentText');
+                if (bar) bar.style.width = pct + '%';
+                if (txt) txt.textContent = pct + '%';
+            }
+
+            function gameLoop() {
+                if (gameState !== 'PLAYING') return;
+
+                frameCount++;
+                distance += gameSpeed;
+                gameSpeed = Math.min(9.2, 6.2 + (distance / GOAL_DISTANCE) * 2.8);
+
+                drawBackground();
+                updateProgressUI();
+
+                if (distance < GOAL_DISTANCE - 480) {
+                    nextObstacleTimer--;
+                    if (nextObstacleTimer <= 0) {
+                        spawnObstacle();
+                        const minGapFrames = Math.ceil(460 / gameSpeed);
+                        nextObstacleTimer = Math.floor(Math.random() * 50) + minGapFrames;
+                    }
+                } else if (!finishLine.active) {
+                    finishLine.active = true;
+                    finishLine.x = canvas.width + 60;
+                }
+
+                for (let i = obstacles.length - 1; i >= 0; i--) {
+                    const obs = obstacles[i];
+                    obs.x -= gameSpeed;
+                    drawObstacle(obs);
+
+                    if (checkCollision(player, obs)) {
+                        gameState = 'GAMEOVER';
+                        document.getElementById('gameOverReason').textContent = `Chocaste con: "${obs.line1} ${obs.line2}"`;
+                        document.getElementById('gameOverOverlay').classList.remove('hidden');
+                        return;
+                    }
+
+                    if (obs.x + obs.w < -20) {
+                        obstacles.splice(i, 1);
+                    }
+                }
+
+                if (finishLine.active) {
+                    finishLine.x -= gameSpeed;
+                    finishLine.draw();
+
+                    if (player.x + player.width >= finishLine.x) {
+                        gameState = 'WIN';
+                        updateProgressUI();
+                        document.getElementById('gameWinOverlay').classList.remove('hidden');
+                        return;
+                    }
+                }
+
+                player.update();
+                player.draw();
+
+                animationFrameId = requestAnimationFrame(gameLoop);
+            }
+
+            window.iniciarJuegoContsoft = function() {
+                cancelAnimationFrame(animationFrameId);
+                gameState = 'PLAYING';
+                distance = 0;
+                gameSpeed = 6.2;
+                obstacles = [];
+                obstacleQueue = [];
+                refillObstacleQueue();
+                nextObstacleTimer = 45;
+                finishLine.active = false;
+                player.y = GROUND_Y - player.height;
+                player.vy = 0;
+                player.isGrounded = true;
+
+                document.getElementById('gameStartOverlay').classList.add('hidden');
+                document.getElementById('gameOverOverlay').classList.add('hidden');
+                document.getElementById('gameWinOverlay').classList.add('hidden');
+                updateProgressUI();
+                gameLoop();
+            };
+
+            canvas.addEventListener('pointerdown', (e) => {
+                e.preventDefault();
+                if (gameState === 'PLAYING' && juegoActivo === 1) player.jump();
+            });
+
+            window.addEventListener('keydown', (e) => {
+                if ((e.code === 'Space' || e.code === 'ArrowUp') && gameState === 'PLAYING' && juegoActivo === 1) {
+                    e.preventDefault();
+                    player.jump();
+                }
+            });
+
+            robotImg.onload = () => {
+                drawBackground();
+                player.draw();
+            };
+            drawBackground();
+            player.draw();
+
+            function ajustarResolucionCanvas() {
+                const isMobile = window.innerWidth < 640;
+                canvas.width = isMobile ? 540 : 900;
+                canvas.height = 320;
+                if (gameState !== 'PLAYING') {
+                    drawBackground();
+                    player.draw();
+                }
+            }
+            window.addEventListener('resize', ajustarResolucionCanvas);
+            ajustarResolucionCanvas();
+        })();
+    </script>
+
+    <!-- SCRIPT JUEGO 2: ATRAPA COMPROBANTES SUNAT -->
+    <script>
+        (function() {
+            const canvas = document.getElementById('catcherGameCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+
+            let state = 'START';
+            let rafId;
+            let score = 0;
+            let lives = 3;
+            let items = [];
+            let spawnTimer = 0;
+            const TARGET_SCORE = 150;
+
+            // Precarga de la imagen de la caja / canasta
+            const basketImg = new Image();
+                basketImg.src = './img/caja-contsoft.png'; // <-- Cambia esta ruta por la de tu imagen
+                basketImg.onload = () => {
+                    if (state !== 'PLAYING') drawCatcherScene();
+            };
+
+            const basket = {
+                x: 390,
+                y: 262, // Ajustado para que no se salga por abajo si h = 60
+                w: 124,
+                h: 60,
+                speed: 10
+            };
+
+            // const basket = {
+            //     x: 390,
+            //     y: 275,
+            //     w: 120,
+            //     h: 44,
+            //     speed: 10
+            // };
+
+            const keys = { left: false, right: false };
+
+            // const ITEM_POOL = [
+            //     { label: 'FACTURA', pts: 10, good: true, bg: '#dbeafe', border: '#2563eb', text: '#1e40af', emoji: '📄' },
+            //     { label: 'BOLETA', pts: 10, good: true, bg: '#dcfce7', border: '#16a34a', text: '#166534', emoji: '🧾' },
+            //     { label: 'GUÍA GRE', pts: 20, good: true, bg: '#fef3c7', border: '#d97706', text: '#92400e', emoji: '🚚' },
+            //     { label: 'MULTA', pts: 0, good: false, bg: '#fee2e2', border: '#dc2626', text: '#991b1b', emoji: '⚠️' },
+            //     { label: 'CAÍDA RED', pts: 0, good: false, bg: '#fce7f3', border: '#db2777', text: '#9d174d', emoji: '💥' }
+            // ];
+
+            // 1. Precarga las imágenes del Juego 2
+            const catcherImages = {};
+            ['factura', 'boleta', 'guia', 'multa', 'caida'].forEach(key => {
+                const img = new Image();
+                img.src = `./img/catcher/${key}.png`; // Ruta de tus imágenes
+                catcherImages[key] = img;
+            });
+
+            // 2. Asigna la clave imgKey y tamaño (w, h) a cada ítem
+            const ITEM_POOL = [
+                { imgKey: 'factura', label: 'FACTURA',   pts: 10, good: true,  w: 64, h: 100 },
+                { imgKey: 'boleta',  label: 'BOLETA',    pts: 10, good: true,  w: 64, h: 100 },
+                { imgKey: 'guia',    label: 'GUÍA GRE',  pts: 20, good: true,  w: 68, h: 100 },
+                { imgKey: 'multa',   label: 'MULTA',     pts: 0,  good: false, w: 64, h: 100 },
+                { imgKey: 'caida',   label: 'CAÍDA RED', pts: 0,  good: false, w: 64, h: 100 }
+            ];
+
+            function updateHUD() {
+                document.getElementById('catcherScore').textContent = `${score} / ${TARGET_SCORE}`;
+                document.getElementById('catcherLives').textContent = '❤️'.repeat(Math.max(0, lives)) || '💔';
+            }
+
+            function drawCatcherScene() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Piso inferior
+                ctx.fillStyle = '#e2e8f0';
+                ctx.fillRect(0, 322, canvas.width, 18);
+
+                // Dibujar caja POS receptora
+                // ctx.save();
+                // ctx.fillStyle = '#1e3a8a';
+                // ctx.strokeStyle = '#38bdf8';
+                // ctx.lineWidth = 3;
+                // ctx.beginPath();
+                // ctx.roundRect(basket.x, basket.y, basket.w, basket.h, 12);
+                // ctx.fill();
+                // ctx.stroke();
+
+                // ctx.fillStyle = '#ffffff';
+                // ctx.font = '800 13px Inter, sans-serif';
+                // ctx.textAlign = 'center';
+                // ctx.fillText('CAJA CONTSOFT', basket.x + basket.w / 2, basket.y + 26);
+                // ctx.restore();
+
+                // Dibujar imagen de la caja / canasta receptora
+                ctx.save();
+                // Sombra suave debajo de la imagen
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.14)';
+                ctx.beginPath();
+                ctx.ellipse(basket.x + basket.w / 2, basket.y + basket.h + 2, basket.w * 0.42, 5, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                if (basketImg.complete && basketImg.naturalWidth > 0) {
+                    ctx.drawImage(basketImg, basket.x, basket.y, basket.w, basket.h);
+                } else {
+                    // Respaldo visual mientras carga o si la ruta no existe
+                    ctx.fillStyle = '#1e3a8a';
+                    ctx.strokeStyle = '#38bdf8';
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.roundRect(basket.x, basket.y, basket.w, basket.h, 12);
+                    ctx.fill();
+                    ctx.stroke();
+
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = '800 12px Inter, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('CAJA', basket.x + basket.w / 2, basket.y + basket.h / 2 + 4);
+                }
+                ctx.restore();
+
+                // Dibujar ítems que caen
+                // items.forEach(it => {
+                //     ctx.save();
+                //     ctx.fillStyle = it.bg;
+                //     ctx.strokeStyle = it.border;
+                //     ctx.lineWidth = 2.5;
+                //     ctx.beginPath();
+                //     ctx.roundRect(it.x, it.y, it.w, it.h, 10);
+                //     ctx.fill();
+                //     ctx.stroke();
+
+                //     ctx.fillStyle = it.text;
+                //     ctx.font = '800 12px Inter, sans-serif';
+                //     ctx.textAlign = 'center';
+                //     ctx.fillText(`${it.emoji} ${it.label}`, it.x + it.w / 2, it.y + 23);
+                //     ctx.restore();
+                // });
+
+                // 3. Dentro de drawCatcherScene(), reemplaza el bucle items.forEach(...) por:
+                items.forEach(it => {
+                    const img = catcherImages[it.imgKey];
+                    if (img && img.complete && img.naturalWidth > 0) {
+                        ctx.drawImage(img, it.x, it.y, it.w, it.h);
+                    } else {
+                        // Respaldo si falta la imagen
+                        ctx.fillStyle = it.good ? '#2563eb' : '#dc2626';
+                        ctx.beginPath();
+                        ctx.roundRect(it.x, it.y, it.w, it.h, 10);
+                        ctx.fill();
+                        ctx.fillStyle = '#fff';
+                        ctx.font = 'bold 11px Inter, sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.fillText(it.label, it.x + it.w / 2, it.y + it.h / 2 + 4);
+                    }
+                });
+            }
+
+            function loopCatcher() {
+                if (state !== 'PLAYING') return;
+
+                if (keys.left) basket.x -= basket.speed;
+                if (keys.right) basket.x += basket.speed;
+                basket.x = Math.max(10, Math.min(canvas.width - basket.w - 10, basket.x));
+
+                spawnTimer--;
+                if (spawnTimer <= 0) {
+                    const tpl = ITEM_POOL[Math.floor(Math.random() * ITEM_POOL.length)];
+                    const w = 112;
+                    items.push({
+                        ...tpl,
+                        x: Math.random() * (canvas.width - w - 20) + 10,
+                        y: -40,
+                        w: w,
+                        h: 36,
+                        vy: 3.6 + (score / TARGET_SCORE) * 2.5
+                    });
+                    spawnTimer = Math.max(24, 46 - Math.floor(score / 10));
+                }
+
+                for (let i = items.length - 1; i >= 0; i--) {
+                    const it = items[i];
+                    it.y += it.vy;
+
+                    // Colisión con la caja POS
+                    const hit = (
+                        it.x < basket.x + basket.w &&
+                        it.x + it.w > basket.x &&
+                        it.y + it.h > basket.y &&
+                        it.y < basket.y + basket.h
+                    );
+
+                    if (hit) {
+                        if (it.good) {
+                            score += it.pts;
+                            updateHUD();
+                            if (score >= TARGET_SCORE) {
+                                state = 'WIN';
+                                drawCatcherScene();
+                                document.getElementById('catcherWinOverlay').classList.remove('hidden');
+                                return;
+                            }
+                        } else {
+                            lives--;
+                            updateHUD();
+                            if (lives <= 0) {
+                                state = 'OVER';
+                                document.getElementById('catcherOverText').textContent = `Alcanzaste ${score} puntos de ${TARGET_SCORE}. ¡Inténtalo de nuevo!`;
+                                document.getElementById('catcherOverOverlay').classList.remove('hidden');
+                                return;
+                            }
+                        }
+                        items.splice(i, 1);
+                        continue;
+                    }
+
+                    if (it.y > canvas.height + 20) {
+                        items.splice(i, 1);
+                    }
+                }
+
+                drawCatcherScene();
+                rafId = requestAnimationFrame(loopCatcher);
+            }
+
+            window.iniciarJuegoCatcher = function() {
+                cancelAnimationFrame(rafId);
+                state = 'PLAYING';
+                score = 0;
+                lives = 3;
+                items = [];
+                spawnTimer = 15;
+                basket.x = (canvas.width - basket.w) / 2;
+
+                document.getElementById('catcherStartOverlay').classList.add('hidden');
+                document.getElementById('catcherOverOverlay').classList.add('hidden');
+                document.getElementById('catcherWinOverlay').classList.add('hidden');
+                updateHUD();
+                loopCatcher();
+            };
+
+            function moverConPuntero(clientX) {
+                if (state !== 'PLAYING' || juegoActivo !== 2) return;
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = canvas.width / rect.width;
+                const posX = (clientX - rect.left) * scaleX;
+                basket.x = Math.max(10, Math.min(canvas.width - basket.w - 10, posX - basket.w / 2));
+            }
+
+            canvas.addEventListener('pointermove', (e) => moverConPuntero(e.clientX));
+            canvas.addEventListener('pointerdown', (e) => moverConPuntero(e.clientX));
+
+            window.addEventListener('keydown', (e) => {
+                if (juegoActivo !== 2) return;
+                if (e.code === 'ArrowLeft') keys.left = true;
+                if (e.code === 'ArrowRight') keys.right = true;
+            });
+            window.addEventListener('keyup', (e) => {
+                if (e.code === 'ArrowLeft') keys.left = false;
+                if (e.code === 'ArrowRight') keys.right = false;
+            });
+
+            drawCatcherScene();
+        })();
+    </script>
+
+    <!-- SCRIPT JUEGO 3: MEMORIA EMPRESARIAL ERP -->
+    <script>
+        (function() {
+            const CARDS_DATA = [
+                { id: 'sunat', label: 'SUNAT 2026', icon: 'shield-check', color: 'text-emerald-600' },
+                { id: 'pos', label: 'Punto Venta POS', icon: 'monitor', color: 'text-blue-600' },
+                { id: 'stock', label: 'Control Stock', icon: 'package', color: 'text-purple-600' },
+                { id: 'guias', label: 'Guías GRE', icon: 'truck', color: 'text-amber-600' },
+                { id: 'pago', label: 'Pago Único', icon: 'infinity', color: 'text-sky-600' },
+                { id: 'rest', label: 'Comandas', icon: 'utensils', color: 'text-rose-600' }
+            ];
+
+            let flippedCards = [];
+            let matchedPairs = 0;
+            let moves = 0;
+            let lockBoard = false;
+
+            window.iniciarJuegoMemoria = function() {
+                window.memoriaInicializada = true;
+                const grid = document.getElementById('memoryGrid');
+                const banner = document.getElementById('memoryWinBanner');
+                if (!grid) return;
+
+                flippedCards = [];
+                matchedPairs = 0;
+                moves = 0;
+                lockBoard = false;
+
+                document.getElementById('memoryPairs').textContent = '0 / 6';
+                document.getElementById('memoryMoves').textContent = '0';
+                banner.classList.add('hidden');
+
+                const deck = [...CARDS_DATA, ...CARDS_DATA];
+                for (let i = deck.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [deck[i], deck[j]] = [deck[j], deck[i]];
+                }
+
+                grid.innerHTML = '';
+                deck.forEach((item) => {
+                    const card = document.createElement('div');
+                    card.className = 'memory-card';
+                    card.dataset.id = item.id;
+
+                    card.innerHTML = `
+                        <div class="memory-card-inner shadow-md rounded-2xl">
+                            <div class="memory-face memory-front">
+                                <i data-lucide="database" class="w-7 h-7 sm:w-8 sm:h-8 text-sky-200 mb-1"></i>
+                                <span class="text-[10px] sm:text-xs font-extrabold tracking-wider uppercase text-white/90">CONTSOFT</span>
+                            </div>
+                            <div class="memory-face memory-back">
+                                <i data-lucide="${item.icon}" class="w-7 h-7 sm:w-8 sm:h-8 ${item.color} mb-1.5"></i>
+                                <span class="text-xs sm:text-sm font-extrabold text-gray-800 leading-tight">${item.label}</span>
+                            </div>
+                        </div>
+                    `;
+
+                    card.addEventListener('click', () => flipCard(card));
+                    grid.appendChild(card);
+                });
+
+                lucide.createIcons();
+            };
+
+            function flipCard(card) {
+                if (lockBoard || card.classList.contains('flipped') || card.classList.contains('matched')) return;
+
+                card.classList.add('flipped');
+                flippedCards.push(card);
+
+                if (flippedCards.length === 2) {
+                    moves++;
+                    document.getElementById('memoryMoves').textContent = moves;
+                    checkMatch();
+                }
+            }
+
+            function checkMatch() {
+                const [first, second] = flippedCards;
+                const isMatch = first.dataset.id === second.dataset.id;
+
+                if (isMatch) {
+                    first.classList.add('matched');
+                    second.classList.add('matched');
+                    flippedCards = [];
+                    matchedPairs++;
+                    document.getElementById('memoryPairs').textContent = `${matchedPairs} / 6`;
+
+                    if (matchedPairs === CARDS_DATA.length) {
+                        document.getElementById('memoryWinStats').innerHTML =
+                            `Completado en <strong>${moves} movimientos</strong>. Código desbloqueado: <strong>CONTSOFT15</strong>`;
+                        document.getElementById('memoryWinBanner').classList.remove('hidden');
+                    }
+                } else {
+                    lockBoard = true;
+                    setTimeout(() => {
+                        first.classList.remove('flipped');
+                        second.classList.remove('flipped');
+                        flippedCards = [];
+                        lockBoard = false;
+                    }, 750);
+                }
+            }
+        })();
+    </script>
+</body>
+</html>
